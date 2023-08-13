@@ -8,8 +8,11 @@ import '../../../cart/data/cart_model.dart';
 class CheckoutState extends Equatable {
   final CubitState status;
   final String message;
+  final String note;
+  final String pickedAddress;
   final int totalBill;
   final bool enableButton;
+  final int paymentId;
   final int createdTransactionId;
   final List<CartModel> cartDetail;
   final UserModel userData;
@@ -17,8 +20,11 @@ class CheckoutState extends Equatable {
   const CheckoutState({
     this.status = CubitState.initial,
     this.message = '',
+    this.note = '',
+    this.pickedAddress = '-',
     this.totalBill = 0,
     this.enableButton = false,
+    this.paymentId = 1,
     this.createdTransactionId = 0,
     this.cartDetail = const [],
     this.userData = const UserModel(),
@@ -27,8 +33,11 @@ class CheckoutState extends Equatable {
   CheckoutState copyWith({
     CubitState? status,
     String? message,
+    String? note,
+    String? pickedAddress,
     int? totalBill,
     bool? enableButton,
+    int? paymentId,
     int? createdTransactionId,
     List<CartModel>? cartDetail,
     UserModel? userData,
@@ -36,8 +45,11 @@ class CheckoutState extends Equatable {
     return CheckoutState(
       status: status ?? this.status,
       message: message ?? this.message,
+      note: note ?? this.note,
+      pickedAddress: pickedAddress ?? this.pickedAddress,
       totalBill: totalBill ?? this.totalBill,
       enableButton: enableButton ?? this.enableButton,
+      paymentId: paymentId ?? this.paymentId,
       createdTransactionId: createdTransactionId ?? this.createdTransactionId,
       cartDetail: cartDetail ?? this.cartDetail,
       userData: userData ?? this.userData,
@@ -49,8 +61,11 @@ class CheckoutState extends Equatable {
     return [
       status,
       message,
+      note,
+      pickedAddress,
       totalBill,
       enableButton,
+      paymentId,
       createdTransactionId,
       cartDetail,
       userData,

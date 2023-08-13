@@ -1,21 +1,23 @@
-// To parse this JSON data, do
-//
-//     final transactionModel = transactionModelFromJson(jsonString);
-
 import 'dart:convert';
 
+import 'package:pawon_ibu_app/common/data/model/payment_type.dart';
+import 'package:pawon_ibu_app/common/data/model/transaction_detail_model.dart';
 import 'package:pawon_ibu_app/common/data/model/user_model.dart';
 
 class TransactionModel {
   final int? id;
   final int? transactionStatus;
   final int? totalBill;
-  final dynamic receivedPaymentTotal;
+  final int? receivedPaymentTotal;
   final DateTime? createdAt;
   final dynamic telephone;
   final dynamic address;
   final int? userId;
+  final dynamic expenses;
+  final int? paymentId;
   final UserModel? user;
+  final List<TransactionDetailModel>? transactionDetail;
+  final PaymentType? paymentType;
 
   TransactionModel({
     this.id,
@@ -26,7 +28,11 @@ class TransactionModel {
     this.telephone,
     this.address,
     this.userId,
+    this.expenses,
+    this.paymentId,
     this.user,
+    this.transactionDetail,
+    this.paymentType,
   });
 
   factory TransactionModel.fromRawJson(String str) =>
@@ -46,7 +52,16 @@ class TransactionModel {
         telephone: json["telephone"],
         address: json["address"],
         userId: json["user_id"],
+        expenses: json["expenses"],
+        paymentId: json["payment_id"],
         user: json["user"] == null ? null : UserModel.fromJson(json["user"]),
+        transactionDetail: json["transaction_detail"] == null
+            ? []
+            : List<TransactionDetailModel>.from(json["transaction_detail"]!
+                .map((x) => TransactionDetailModel.fromJson(x))),
+        paymentType: json["payment_type"] == null
+            ? null
+            : PaymentType.fromJson(json["payment_type"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -58,6 +73,12 @@ class TransactionModel {
         "telephone": telephone,
         "address": address,
         "user_id": userId,
+        "expenses": expenses,
+        "payment_id": paymentId,
         "user": user?.toJson(),
+        "transaction_detail": transactionDetail == null
+            ? []
+            : List<dynamic>.from(transactionDetail!.map((x) => x.toJson())),
+        "payment_type": paymentType?.toJson(),
       };
 }

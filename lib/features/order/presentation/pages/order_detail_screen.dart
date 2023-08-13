@@ -14,18 +14,15 @@ import '../../../../ui/widgets/product_list_tile.dart';
 class OrderDetailScreen extends StatelessWidget {
   const OrderDetailScreen({super.key});
 
-  static const bcaAccount = '7425419188';
-
   static final TextEditingController _expansesController =
       TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final buyerName = ModalRoute.of(context)!.settings.arguments as String;
-    final cubit = context.read<OrderCubit>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pembayaran'),
+        title: const Text('Pesanan'),
         elevation: 1,
       ),
       body: ListView(
@@ -33,91 +30,102 @@ class OrderDetailScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             color: whiteColor,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  buyerName,
-                  style: productNameStyle.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const DividerWidget(
-                  padding: 1,
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: BlocBuilder<OrderCubit, OrderState>(
+              builder: (context, state) {
+                final totalBill = state.totalBill;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Bank Central Asia',
-                      style: sectionTitleStyle,
+                      buyerName,
+                      style: productNameStyle.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    SvgPicture.asset(
-                      'assets/logo/bca_logo.svg',
-                      width: 16,
-                      height: 16,
-                    )
-                  ],
-                ),
-                const DividerWidget(
-                  padding: 1,
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
+                    const DividerWidget(
+                      padding: 1,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Nomor Rekening',
-                          style: descStyle.copyWith(fontSize: 12),
-                        ),
-                        const SizedBox(height: 4.0),
-                        Text(
-                          bcaAccount,
+                          state.orderDetail.firstOrNull?.transaction
+                                  ?.paymentType?.name ??
+                              '',
                           style: sectionTitleStyle,
+                        ),
+                        SvgPicture.network(
+                          state.orderDetail.firstOrNull?.transaction
+                                  ?.paymentType?.image ??
+                              '',
+                          width: 16,
+                          height: 16,
+                        )
+                      ],
+                    ),
+                    const DividerWidget(
+                      padding: 1,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Nomor Rekening',
+                              style: descStyle.copyWith(fontSize: 12),
+                            ),
+                            const SizedBox(height: 4.0),
+                            Text(
+                              state.orderDetail.firstOrNull?.transaction
+                                      ?.paymentType?.accountNumber ??
+                                  '',
+                              style: sectionTitleStyle,
+                            ),
+                          ],
+                        ),
+                        GestureDetector(
+                          onTap: () async => await Clipboard.setData(
+                            ClipboardData(
+                              text: state.orderDetail.firstOrNull?.transaction
+                                      ?.paymentType?.accountNumber ??
+                                  '',
+                            ),
+                          ),
+                          child: RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Salin',
+                                  style: blueTextStyle.copyWith(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const WidgetSpan(
+                                  alignment: PlaceholderAlignment.top,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 2.0),
+                                    child: Icon(
+                                      CupertinoIcons.square_fill_on_square_fill,
+                                      color: blueColor,
+                                      size: 10,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    GestureDetector(
-                      onTap: () async => await Clipboard.setData(
-                        const ClipboardData(text: bcaAccount),
-                      ),
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Salin',
-                              style: blueTextStyle.copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const WidgetSpan(
-                              alignment: PlaceholderAlignment.top,
-                              child: Padding(
-                                padding: EdgeInsets.only(left: 2.0),
-                                child: Icon(
-                                  CupertinoIcons.square_fill_on_square_fill,
-                                  color: blueColor,
-                                  size: 10,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const DividerWidget(padding: 1),
-                BlocBuilder<OrderCubit, OrderState>(
-                  builder: (context, state) {
-                    final totalBill = state.totalBill;
-                    return Row(
+                    const DividerWidget(padding: 1),
+                    Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -168,13 +176,53 @@ class OrderDetailScreen extends StatelessWidget {
                           ),
                         ),
                       ],
-                    );
-                  },
-                ),
-                const DividerWidget(
-                  padding: 1,
-                )
-              ],
+                    ),
+                    const DividerWidget(
+                      padding: 1,
+                    ),
+                    (state.orderDetail.firstOrNull?.transaction?.expenses !=
+                                0 ||
+                            state.orderDetail.firstOrNull?.transaction
+                                    ?.expenses ==
+                                null)
+                        ? Column(
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Total Pengeluaran',
+                                        style: descStyle.copyWith(fontSize: 12),
+                                      ),
+                                      const SizedBox(height: 4.0),
+                                      Text(
+                                        formatRupiah(
+                                          state.orderDetail.firstOrNull
+                                                  ?.transaction?.expenses ??
+                                              0,
+                                        ),
+                                        style: sectionTitleStyle,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const DividerWidget(
+                                padding: 1,
+                              )
+                            ],
+                          )
+                        : const SizedBox.shrink()
+                  ],
+                );
+              },
             ),
           ),
           const SizedBox(height: 16),
@@ -267,7 +315,7 @@ class OrderDetailScreen extends StatelessWidget {
           actions: [
             ElevatedButton(
               onPressed: () async {
-                await context.read<OrderCubit>().completeProcess(
+                await context.read<OrderCubit>().confirmOrder(
                       expanses: int.parse(_expansesController.text),
                     );
                 if (context.mounted) {
@@ -287,9 +335,9 @@ class OrderDetailScreen extends StatelessWidget {
 
     switch (status) {
       case 1:
-        return cubit.confirmOrder();
-      case 2:
         return showOutcomeDialog(context);
+      case 2:
+        return cubit.completeProcess();
       case 3:
         return cubit.deliverOrder();
       case 4:

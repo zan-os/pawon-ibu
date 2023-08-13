@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawon_ibu_app/common/router/app_router.dart';
 import 'package:pawon_ibu_app/features/order/presentation/cubit/order_cubit.dart';
 import 'package:pawon_ibu_app/features/order/presentation/cubit/order_state.dart';
-import 'package:pawon_ibu_app/features/order/presentation/widgets/order_card_widget.dart';
 import 'package:pawon_ibu_app/ui/theme/app_theme.dart';
+import 'package:pawon_ibu_app/ui/widgets/order_card_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/di/core_injection.dart';
@@ -79,7 +79,10 @@ class OrderScreen extends StatelessWidget {
                 const SizedBox(height: 16.0),
                 BlocBuilder<OrderCubit, OrderState>(
                   builder: (context, state) {
-                    return ListView.builder(
+                    return ListView.separated(
+                      separatorBuilder: (context, index) {
+                        return const SizedBox(height: 8.0);
+                      },
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: state.orders.length,
@@ -101,6 +104,8 @@ class OrderScreen extends StatelessWidget {
                             );
                           },
                           child: OrderCard(
+                            bankImage: order.paymentType!.image!,
+                            bankName: order.paymentType!.name!,
                             status: order.transactionStatus ?? 1,
                             firstName: order.user?.firstName ?? '',
                             lastName: order.user?.lastName ?? '',

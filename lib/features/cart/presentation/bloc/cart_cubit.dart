@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawon_ibu_app/core/di/core_injection.dart';
@@ -23,12 +24,9 @@ class CartCubit extends Cubit<CartState> {
 
   void fetchCart() async {
     try {
-      await _supabase
-          .from('cart')
-          .select('''id, qty, total_bill,
-    product:product_id (*)''')
-          .eq('user_id', _userId)
-          .then(
+      log('ojan $_userId');
+      await _supabase.from('cart').select('''id, qty, total_bill,
+    product:product_id (*)''').eq('user_id', _userId).then(
             (response) {
               final encoded = jsonEncode(response);
               final List decoded = jsonDecode(encoded);
@@ -43,8 +41,8 @@ class CartCubit extends Cubit<CartState> {
               }
             },
           );
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
       emit(state.copyWith(
         status: CubitState.error,
         message: 'Gagal mendapatkan kategori',
@@ -59,8 +57,8 @@ class CartCubit extends Cubit<CartState> {
           await _supabase.rpc('get_total_bill', params: params).select();
       emit(state.copyWith(status: CubitState.initial, totalBill: totalBill));
       emit(state.copyWith(enableButton: true));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
       emit(state.copyWith(
         status: CubitState.error,
         message: 'Gagal mendapatkan total bill',
@@ -78,8 +76,8 @@ class CartCubit extends Cubit<CartState> {
           cartDetail: List.empty(),
           totalBill: 0));
       emit(state.copyWith(status: CubitState.initial));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
       emit(state.copyWith(
           status: CubitState.error, message: 'Gagal menghapus cart'));
     }
@@ -109,8 +107,8 @@ class CartCubit extends Cubit<CartState> {
       );
 
       emit(state.copyWith(status: CubitState.initial));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
       emit(state.copyWith(
           status: CubitState.error, message: 'Gagal menambahkan ke keranjang'));
     }
@@ -139,8 +137,8 @@ class CartCubit extends Cubit<CartState> {
       );
 
       emit(state.copyWith(status: CubitState.initial));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
       emit(state.copyWith(
           status: CubitState.error, message: 'Gagal menambahkan ke keranjang'));
     }

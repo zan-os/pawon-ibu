@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "234517502095",
+    "project_id": "storedb-210f5",
+    "storage_bucket": "storedb-210f5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:234517502095:android:f80f2258afea38ed0638fa",
+        "android_client_info": {
+          "package_name": "com.example.pawon_ibu_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "234517502095-uf2m5f1gm1lqt7a9htucsa0h9ok6vido.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAga306Gz-ZJnB2RgcVTJcLJg7mNP7Yamo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "234517502095-uf2m5f1gm1lqt7a9htucsa0h9ok6vido.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

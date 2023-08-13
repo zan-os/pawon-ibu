@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawon_ibu_app/common/utils/error_logger.dart';
 import 'package:pawon_ibu_app/features/payment/presentation/cubit/payment_state.dart';
@@ -9,7 +12,7 @@ import '../../../../common/utils/cubit_state.dart';
 import '../../../../core/di/core_injection.dart';
 
 class PaymentCubit extends Cubit<PaymentState> {
-  PaymentCubit() : super(const PaymentState());
+  PaymentCubit() : super(const PaymentState(status: CubitState.initial));
 
   final _supabase = sl<SupabaseClient>();
   final _userId = sl<SharedPreferences>().getInt('user_id');
@@ -22,10 +25,12 @@ class PaymentCubit extends Cubit<PaymentState> {
       final List response = await _supabase
           .from('transaction_detail')
           .select(
-            '*,transaction:transaction_id (*), product:product_id (name, image)',
+            '*,transaction:transaction_id (*, payment_type:payment_id(*)), product:product_id (name, image)',
           )
           .eq('user_id', _userId)
           .eq('transaction_id', _transactionId);
+
+      log('ojan ${jsonEncode(response)}');
       final List<TransactionDetailModel> transaction =
           response.map((e) => TransactionDetailModel.fromJson(e)).toList();
 
@@ -35,8 +40,8 @@ class PaymentCubit extends Cubit<PaymentState> {
             status: CubitState.finishLoading, transaction: transaction));
         emit(state.copyWith(status: CubitState.initial));
       });
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 }

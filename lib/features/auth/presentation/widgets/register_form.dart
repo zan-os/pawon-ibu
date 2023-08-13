@@ -19,7 +19,8 @@ class _RegisterFormState extends State<RegisterForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
 
   bool isFormValid(String email, String password) {
     if (email.isNotEmpty && password.isNotEmpty) {
@@ -34,7 +35,8 @@ class _RegisterFormState extends State<RegisterForm> {
     _emailController.dispose();
     _passwordController.dispose();
     _firstNameController.dispose();
-    _lastNameController.dispose();
+    _addressController.dispose();
+    _phoneNumberController.dispose();
   }
 
   @override
@@ -54,17 +56,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 keyboardType: TextInputType.visiblePassword,
                 obsecureText: false,
                 enabled: true,
-                label: 'First Name',
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: RoundedBorderedTextField(
-                controller: _lastNameController,
-                keyboardType: TextInputType.visiblePassword,
-                obsecureText: false,
-                enabled: true,
-                label: 'Last Name',
+                label: 'Nama Lengkap',
               ),
             ),
             Padding(
@@ -87,13 +79,33 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
             ),
             Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: RoundedBorderedTextField(
+                controller: _addressController,
+                keyboardType: TextInputType.visiblePassword,
+                obsecureText: false,
+                enabled: true,
+                label: 'Alamat',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: RoundedBorderedTextField(
+                controller: _phoneNumberController,
+                keyboardType: TextInputType.visiblePassword,
+                obsecureText: false,
+                enabled: true,
+                label: 'Nomor Handphone',
+              ),
+            ),
+            Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 16),
               child: RoundedButton(
                 onTap: () {
                   final String email = _emailController.text.trim();
                   final String password = _passwordController.text.trim();
                   final String firstName = _firstNameController.text.trim();
-                  final String lastName = _lastNameController.text.trim();
+                  final String lastName = _addressController.text.trim();
 
                   FocusScope.of(context).requestFocus(unfocusNode);
 

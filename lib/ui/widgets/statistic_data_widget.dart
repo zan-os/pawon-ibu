@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:pawon_ibu_app/ui/theme/app_theme.dart';
 
 class StatisticDataWidget extends StatelessWidget {
-  final int tProduct, tOutOfStock, tTransaction;
+  final int tProduct, tNewOrder, tTransaction;
   final String tIncome;
   const StatisticDataWidget({
     super.key,
     this.tProduct = 0,
-    this.tOutOfStock = 0,
+    this.tNewOrder = 0,
     this.tTransaction = 0,
     this.tIncome = '',
   });
@@ -21,8 +21,8 @@ class StatisticDataWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: [
+            _buildStatisticWidget(tNewOrder.toString(), 'Pesanan Baru'),
             _buildStatisticWidget(tProduct.toString(), 'Total Produk'),
-            _buildStatisticWidget(tOutOfStock.toString(), 'Produk yang habis'),
           ],
         ),
         const SizedBox(height: 8.0),

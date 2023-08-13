@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,37 +15,46 @@ class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(const HomeState(status: CubitState.initial));
 
   static final _supabase = sl<SupabaseClient>();
-  // final _supabase = Supabase.instance.client;
 
   init() {
+    fetchBestSales();
     fetchCategories();
     fetchProducts();
   }
 
   fetchProducts() async {
     try {
-      final response = await _supabase.from('product').select('*');
-      final encoded = jsonEncode(response);
-      final List decoded = jsonDecode(encoded);
+      final List response = await _supabase.from('product').select('*');
+
       final List<ProductModel> products =
-          decoded.map((e) => ProductModel.fromJson(e)).toList();
+          response.map((e) => ProductModel.fromJson(e)).toList();
       emit(state.copyWith(products: products));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
+    }
+  }
+
+  fetchBestSales() async {
+    try {
+      final List response = await _supabase.rpc('get_best_sales');
+      log('ojan ${jsonEncode(response)}');
+      final List<ProductModel> products =
+          response.map((e) => ProductModel.fromJson(e)).toList();
+      emit(state.copyWith(bestSales: products));
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 
   fetchCategories() async {
     try {
-      final response = await _supabase.from('category').select('*');
+      final List response = await _supabase.from('category').select('*');
 
-      final encoded = jsonEncode(response);
-      final List decoded = jsonDecode(encoded);
       final List<CategoryModel> categories =
-          decoded.map((e) => CategoryModel.fromJson(e)).toList();
+          response.map((e) => CategoryModel.fromJson(e)).toList();
       emit(state.copyWith(categories: categories));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 }

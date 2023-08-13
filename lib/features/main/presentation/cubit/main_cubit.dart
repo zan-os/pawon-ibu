@@ -22,8 +22,8 @@ class MainCubit extends Cubit<MainState> {
   changeIndex(int index) {
     try {
       emit(state.copyWith(currentIndex: index));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 }

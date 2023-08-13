@@ -1,8 +1,8 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
-import 'package:pawon_ibu_app/features/dashboard/data/model/best_sales_model.dart';
+import 'package:pawon_ibu_app/common/data/model/transaction_model.dart';
 
 import '../../../../common/utils/cubit_state.dart';
-import '../../data/model/sales_model.dart';
 
 class DashboardState extends Equatable {
   final CubitState status;
@@ -10,8 +10,10 @@ class DashboardState extends Equatable {
   final int grossIncome;
   final int totalExpense;
   final int netIncome;
-  final List<SalesModel> sales;
-  final List<BestSalesModel> bestSales;
+  final int totalProdct;
+  final int totalTransaction;
+  final int totalNewOrder;
+  final List<TransactionModel> newOrder;
 
   const DashboardState({
     this.status = CubitState.initial,
@@ -19,8 +21,10 @@ class DashboardState extends Equatable {
     this.grossIncome = 0,
     this.totalExpense = 0,
     this.netIncome = 0,
-    this.sales = const [],
-    this.bestSales = const [],
+    this.totalProdct = 0,
+    this.totalTransaction = 0,
+    this.totalNewOrder = 0,
+    this.newOrder = const [],
   });
 
   DashboardState copyWith({
@@ -29,8 +33,10 @@ class DashboardState extends Equatable {
     int? grossIncome,
     int? totalExpense,
     int? netIncome,
-    List<SalesModel>? sales,
-    List<BestSalesModel>? bestSales,
+    int? totalProdct,
+    int? totalTransaction,
+    int? totalNewOrder,
+    List<TransactionModel>? newOrder,
   }) {
     return DashboardState(
       status: status ?? this.status,
@@ -38,8 +44,10 @@ class DashboardState extends Equatable {
       grossIncome: grossIncome ?? this.grossIncome,
       totalExpense: totalExpense ?? this.totalExpense,
       netIncome: netIncome ?? this.netIncome,
-      sales: sales ?? this.sales,
-      bestSales: bestSales ?? this.bestSales,
+      totalProdct: totalProdct ?? this.totalProdct,
+      totalTransaction: totalTransaction ?? this.totalTransaction,
+      totalNewOrder: totalNewOrder ?? this.totalNewOrder,
+      newOrder: newOrder ?? this.newOrder,
     );
   }
 
@@ -51,8 +59,10 @@ class DashboardState extends Equatable {
       grossIncome,
       totalExpense,
       netIncome,
-      sales,
-      bestSales,
+      totalProdct,
+      totalTransaction,
+      totalNewOrder,
+      newOrder,
     ];
   }
 }

@@ -2,13 +2,12 @@ import 'dart:convert';
 
 class ProductModel {
   final int id;
-  final String createdAt;
+  final String? createdAt;
   final String name;
   final String description;
   final int price;
   final int categoryId;
   final String? image;
-  final double? weight;
 
   ProductModel({
     required this.id,
@@ -18,7 +17,6 @@ class ProductModel {
     required this.price,
     required this.categoryId,
     this.image,
-    this.weight,
   });
 
   factory ProductModel.fromRawJson(String str) =>
@@ -33,8 +31,7 @@ class ProductModel {
         description: json["description"],
         price: json["price"],
         categoryId: json["category_id"],
-        image: json["image"],
-        weight: json["weight"],
+        image: json["image"] ?? '',
       );
 
   Map<String, dynamic> toJson() => {
@@ -45,6 +42,5 @@ class ProductModel {
         "price": price,
         "category_id": categoryId,
         "image": image,
-        "weight": weight,
       };
 }

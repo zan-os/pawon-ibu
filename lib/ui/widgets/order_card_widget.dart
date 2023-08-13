@@ -1,11 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 
-import '../../../../common/utils/currency_formatter.dart';
-import '../../../../common/utils/date_time_formatter.dart';
-import '../../../../ui/theme/app_theme.dart';
-import '../../../../ui/widgets/divider_widget.dart';
+import '../../common/utils/currency_formatter.dart';
+import '../../common/utils/date_time_formatter.dart';
+import '../theme/app_theme.dart';
+import 'divider_widget.dart';
 
 class OrderCard extends StatelessWidget {
   const OrderCard({
@@ -15,6 +15,8 @@ class OrderCard extends StatelessWidget {
     required this.createdOrder,
     required this.totalBill,
     required this.status,
+    required this.bankName,
+    required this.bankImage,
   }) : super(key: key);
 
   final String firstName;
@@ -22,6 +24,8 @@ class OrderCard extends StatelessWidget {
   final DateTime createdOrder;
   final int totalBill;
   final int status;
+  final String bankName;
+  final String bankImage;
 
   String getStatus({required int status}) {
     switch (status) {
@@ -46,12 +50,14 @@ class OrderCard extends StatelessWidget {
       elevation: 1,
       borderRadius: BorderRadius.circular(10),
       child: Container(
+        width: 300,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -97,15 +103,13 @@ class OrderCard extends StatelessWidget {
                 )
               ],
             ),
-
-            // TODO: Tampilin semua list order
             const DividerWidget(padding: 4.0),
             RichText(
               text: TextSpan(
                 children: [
                   WidgetSpan(
-                    child: SvgPicture.asset(
-                      'assets/logo/bca_logo.svg',
+                    child: SvgPicture.network(
+                      bankImage,
                       height: 16,
                       width: 16,
                     ),
@@ -116,7 +120,7 @@ class OrderCard extends StatelessWidget {
                     ),
                   ),
                   TextSpan(
-                    text: 'Bank Central Asia',
+                    text: bankName,
                     style: productNameStyle.copyWith(
                         fontSize: 16, fontWeight: FontWeight.w600),
                   ),

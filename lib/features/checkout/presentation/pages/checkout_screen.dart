@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:pawon_ibu_app/common/router/app_router.dart';
 import 'package:pawon_ibu_app/ui/theme/app_theme.dart';
+import 'package:pawon_ibu_app/ui/widgets/rounded_bordered_text_field.dart';
 
 import '../../../../common/utils/cubit_state.dart';
 import '../../../../common/utils/currency_formatter.dart';
@@ -99,59 +100,84 @@ class _CheckoutButton extends StatelessWidget {
     return showDialog(
       barrierDismissible: true,
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          actionsPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          backgroundColor: lightBackgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          title: const Text('Pembayaran'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Pembayaran baru dapat dilakukan dengan transfer bank & pengecekan secara manual',
-                style: blackTextStyle.copyWith(fontSize: 13),
+      builder: (_) {
+        return BlocBuilder<CheckoutCubit, CheckoutState>(
+          bloc: cubit,
+          builder: (context, state) {
+            return AlertDialog(
+              actionsPadding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              backgroundColor: lightBackgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
-            ],
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Column(
-                  children: [
-                    Text(
-                      'Total Tagihan',
-                      style: sectionTitleStyle.copyWith(fontSize: 12),
+              title: const Text('Metode Pembayaran'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Pembayaran baru dapat dilakukan dengan transfer bank & pengecekan secara manual',
+                    style: blackTextStyle.copyWith(fontSize: 13),
+                  ),
+                  ListTile(
+                    title: const Text('Bank Central Asia'),
+                    leading: Radio(
+                      value: 1,
+                      groupValue: state.paymentId,
+                      onChanged: (value) {
+                        cubit.setPaymentType(paymentId: 1);
+                      },
                     ),
-                    const SizedBox(height: 4.0),
-                    Text(
-                      formatRupiah(totalBill),
-                      style: sectionTitleStyle,
+                  ),
+                  ListTile(
+                    title: const Text('Bank Negara Indonesia'),
+                    leading: Radio(
+                      value: 2,
+                      groupValue: state.paymentId,
+                      onChanged: (value) {
+                        cubit.setPaymentType(paymentId: 2);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          'Total Tagihan',
+                          style: sectionTitleStyle.copyWith(fontSize: 12),
+                        ),
+                        const SizedBox(height: 4.0),
+                        Text(
+                          formatRupiah(totalBill),
+                          style: sectionTitleStyle,
+                        ),
+                      ],
+                    ),
+                    BlocBuilder<CheckoutCubit, CheckoutState>(
+                      bloc: cubit,
+                      builder: (context, state) {
+                        return ElevatedButton(
+                          onPressed: () {
+                            onPayTap();
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Text('Lanjut Bayar'),
+                          ),
+                        );
+                      },
                     ),
                   ],
-                ),
-                BlocBuilder<CheckoutCubit, CheckoutState>(
-                  bloc: cubit,
-                  builder: (context, state) {
-                    return ElevatedButton(
-                      onPressed: () {
-                        onPayTap();
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text('Lanjut Bayar'),
-                      ),
-                    );
-                  },
-                ),
+                )
               ],
-            )
-          ],
+            );
+          },
         );
       },
     );
@@ -169,6 +195,15 @@ class _CheckoutButton extends StatelessWidget {
             enable: state.cartDetail.isNotEmpty,
             title: 'Bayar',
             onTap: () {
+              if (state.note.isEmpty || state.pickedAddress == '-') {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  showSnackBar(
+                    'Pilih alamat & masukan detail alamat pada Note',
+                    isError: true,
+                  ),
+                );
+                return;
+              }
               if (state.cartDetail.isNotEmpty && state.enableButton) {
                 _showPaymentDialog(
                     context, state.cartDetail.first.totalBill ?? 0, () async {
@@ -265,6 +300,8 @@ class _PaymentDetailSection extends StatelessWidget {
 class _OrderedItemSection extends StatelessWidget {
   const _OrderedItemSection();
 
+  static final TextEditingController _noteController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<CheckoutCubit>();
@@ -279,17 +316,43 @@ class _OrderedItemSection extends StatelessWidget {
               style: sectionTitleStyle,
             ),
             const DividerWidget(),
-            Text('${user.firstName} ${user.lastName}',
-                style: blackTextStyle.copyWith(
-                    fontSize: 15, fontWeight: FontWeight.w500)),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: Text(user.telepon ?? '',
-                  style: blackTextStyle.copyWith(fontSize: 13)),
+            Text(
+              '${user.firstName} ${user.lastName}',
+              style: blackTextStyle.copyWith(
+                  fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: Text(
+                    state.pickedAddress,
+                    style: blackTextStyle.copyWith(fontSize: 13),
+                  ),
+                ),
+                InkWell(
+                  onTap: () => cubit.navigateAndDisplaySelection(context),
+                  child: Text(
+                    'Ubah Alamat',
+                    style: blueTextStyle.copyWith(fontSize: 13),
+                  ),
+                ),
+              ],
             ),
             Text(
-              user.address ?? '',
-              style: greyTextStyle.copyWith(fontSize: 13),
+              user.telepon ?? '',
+              style: blackTextStyle.copyWith(fontSize: 13),
+            ),
+            const DividerWidget(),
+            RoundedBorderedTextField(
+              label: 'Note',
+              hintText: 'Jl. Gurame 2 RT.021 RW.018',
+              enabled: true,
+              controller: _noteController,
+              onChange: (value) {
+                cubit.setNote(note: value);
+              },
             ),
             const DividerWidget(),
           ],

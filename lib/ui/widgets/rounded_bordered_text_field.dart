@@ -4,11 +4,13 @@ import '../theme/app_theme.dart';
 
 class RoundedBorderedTextField extends StatefulWidget {
   final String label;
+  final String hintText;
   final TextEditingController? controller;
   final bool enabled;
   final bool? obsecureText;
   final TextInputType? keyboardType;
   final Function(String)? onChange;
+
   const RoundedBorderedTextField({
     Key? key,
     required this.label,
@@ -17,6 +19,7 @@ class RoundedBorderedTextField extends StatefulWidget {
     this.onChange,
     this.keyboardType,
     this.obsecureText,
+    this.hintText = '',
   }) : super(key: key);
 
   @override
@@ -74,8 +77,9 @@ class _RoundedBorderedTextFieldState extends State<RoundedBorderedTextField> {
       enabledBorder: _fieldBorder(),
       focusedBorder: _fieldBorder(focused: true),
       filled: true,
+      hintText: widget.hintText,
       fillColor: Colors.white,
-      hintStyle: TextStyle(color: purpleColor),
+      hintStyle: const TextStyle(color: greyColor),
       contentPadding: const EdgeInsetsDirectional.fromSTEB(20, 24, 0, 24),
     );
   }

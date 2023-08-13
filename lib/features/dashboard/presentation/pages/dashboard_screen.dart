@@ -1,191 +1,182 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:developer';
-
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawon_ibu_app/common/router/app_router.dart';
-import 'package:pawon_ibu_app/common/utils/currency_formatter.dart';
-import 'package:pawon_ibu_app/common/utils/currency_shorter.dart';
-import 'package:pawon_ibu_app/features/dashboard/data/model/sales_model.dart';
-import 'package:pawon_ibu_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'package:pawon_ibu_app/features/dashboard/presentation/cubit/dashboard_state.dart';
+import 'package:pawon_ibu_app/features/dashboard/presentation/widgets/rounded_blue_drawable.dart';
 import 'package:pawon_ibu_app/ui/theme/app_theme.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class DashboardDataScreen extends StatelessWidget {
-  const DashboardDataScreen({super.key});
+import '../../../../common/utils/currency_formatter.dart';
+import '../../../../core/di/core_injection.dart';
+import '../../../../ui/drawable/rounded_white_drawable.dart';
+import '../../../../ui/widgets/order_card_widget.dart';
+import '../../../../ui/widgets/statistic_data_widget.dart';
+import '../../data/model/feature_grid_model.dart';
+import '../cubit/dashboard_cubit.dart';
+
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<DashboardCubit>();
     return Scaffold(
-      body: SafeArea(
-        child: BlocBuilder<DashboardCubit, DashboardState>(
-          builder: (context, state) {
-            return ListView(
-              children: [
-                SfCartesianChart(
-                  crosshairBehavior: CrosshairBehavior(enable: true),
-                  trackballBehavior: TrackballBehavior(
-                    enable: true,
-                  ),
-                  primaryXAxis: CategoryAxis(),
-                  // Chart title
-                  title: ChartTitle(text: 'Penjualan Tahun 2023'),
-                  // Enable legend
-                  legend: const Legend(isVisible: true),
-                  onChartTouchInteractionDown: (tapArgs) {
-                    log('tap');
-                  },
-
-                  series: <ChartSeries<SalesModel, String>>[
-                    BarSeries<SalesModel, String>(
-                      dataLabelMapper: (datum, index) {
-                        return currencyShorter(
-                                state.sales[index].incomes ?? 0) ??
-                            '';
-                      },
-                      isVisibleInLegend: false,
-                      dataSource: state.sales,
-                      xValueMapper: (SalesModel sales, _) => sales.month,
-                      yValueMapper: (SalesModel sales, _) => sales.sales,
-                      // Enable data label
-                      dataLabelSettings: const DataLabelSettings(
-                          isVisible: true, textStyle: TextStyle(fontSize: 10)),
-                    )
-                  ],
-                ),
-                _FinancialRecordsTile(
-                  title: 'Hasil Penjualan',
-                  amount: state.grossIncome,
-                  textStyle: blackTextStyle,
-                ),
-                _FinancialRecordsTile(
-                  title: 'Total Pengeluaran',
-                  amount: state.totalExpense,
-                  textStyle: blackTextStyle,
-                ),
-                _FinancialRecordsTile(
-                  title: 'Total Pendapatan',
-                  amount: state.netIncome,
-                  textStyle: productNameStyle.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, AppRouter.order),
-                  child: const Text('orders'),
-                ),
-                ElevatedButton(
-                  onPressed: () => context.read<DashboardCubit>().init(),
-                  child: const Text('orders'),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: ExpansionTile(
-                    title: const Text('Total Penjualan Kue'),
-                    children: [
-                      Table(
-                        border: TableBorder.all(color: greyColor),
-                        defaultVerticalAlignment:
-                            TableCellVerticalAlignment.middle,
-                        children: [
-                          TableRow(
-                            decoration: const BoxDecoration(color: blueColor),
-                            children: [
-                              _TableCell(
-                                title: 'Nama Kue',
-                                textStyle: whiteTextStyle,
-                              ),
-                              _TableCell(
-                                title: 'Harga',
-                                textStyle: whiteTextStyle,
-                              ),
-                              _TableCell(
-                                title: 'Terjual',
-                                textStyle: whiteTextStyle,
-                              ),
-                            ],
-                          ),
-                          ...List.generate(state.bestSales.length, (index) {
-                            final bestSales = state.bestSales[index];
-                            return TableRow(
-                              children: [
-                                _TableCell(
-                                  title: bestSales.productName ?? '',
-                                  textStyle: blackTextStyle,
-                                ),
-                                _TableCell(
-                                  title: formatRupiah(bestSales.productPrice),
-                                  textStyle: blackTextStyle,
-                                ),
-                                _TableCell(
-                                  title: bestSales.totalSold.toString(),
-                                  textStyle: blackTextStyle,
-                                ),
-                              ],
-                            );
-                          })
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
+      body: EasyRefresh(
+        onRefresh: () => cubit.init(),
+        triggerAxis: Axis.vertical,
+        child: SingleChildScrollView(
+          child: Stack(
+            children: [
+              _buildHomeHeader(),
+              _buildHomeBody(context: context),
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
-class _FinancialRecordsTile extends StatelessWidget {
-  const _FinancialRecordsTile({
-    Key? key,
-    required this.title,
-    required this.amount,
-    required this.textStyle,
-  }) : super(key: key);
-
-  final String title;
-  final int amount;
-  final TextStyle textStyle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: textStyle),
-          Text(formatRupiah(amount), style: textStyle),
-        ],
-      ),
+  Widget _buildHomeBody({required BuildContext context}) {
+    return ListView(
+      shrinkWrap: true,
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 24.0),
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        const SizedBox(height: 16.0),
+        _buildStatisticData(),
+        _buildGridView(),
+        const SizedBox(height: 16.0),
+        _buildNewTransaction(context)
+      ],
     );
   }
-}
 
-class _TableCell extends StatelessWidget {
-  const _TableCell({
-    Key? key,
-    required this.title,
-    required this.textStyle,
-  }) : super(key: key);
+  Column _buildNewTransaction(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Pesanan Baru', style: sectionTitleStyle),
+        const SizedBox(height: 8.0),
+        BlocBuilder<DashboardCubit, DashboardState>(
+          bloc: context.read<DashboardCubit>()..init(),
+          builder: (context, state) {
+            return SizedBox(
+              height: 150,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: state.newOrder.length,
+                itemBuilder: (context, index) {
+                  final order = state.newOrder[index];
+                  final buyerName =
+                      '${order.user!.firstName!} ${order.user!.lastName!}';
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: InkWell(
+                      onTap: () async {
+                        sl<SharedPreferences>().setInt(
+                          'created_transaction_id',
+                          order.id!,
+                        );
+                        Navigator.pushNamed(
+                          context,
+                          AppRouter.orderDetail,
+                          arguments: buyerName,
+                        ).then(
+                            (value) => context.read<DashboardCubit>().init());
+                      },
+                      child: OrderCard(
+                        bankImage: order.paymentType!.image!,
+                        bankName: order.paymentType!.name!,
+                        status: order.transactionStatus ?? 1,
+                        createdOrder: order.createdAt!,
+                        firstName: order.user!.firstName!,
+                        lastName: order.user!.lastName!,
+                        totalBill: order.totalBill!,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
 
-  final String title;
-  final TextStyle textStyle;
+  GridView _buildGridView() {
+    final List<FeatureGridModel> featureGridItem = [
+      const FeatureGridModel(
+        icon: Icons.add_box_outlined,
+        title: 'Tambah Produk',
+        page: AppRouter.addProduct,
+      ),
+      const FeatureGridModel(
+        icon: Icons.add_business_outlined,
+        title: 'Catatan Penjualan',
+        page: AppRouter.salesData,
+      ),
+      const FeatureGridModel(
+        icon: Icons.stacked_bar_chart_outlined,
+        title: 'List Transaksi',
+        page: AppRouter.order,
+      ),
+    ];
 
-  @override
-  Widget build(BuildContext context) {
-    return TableCell(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          title,
-          style: textStyle,
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      gridDelegate:
+          const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+      itemCount: featureGridItem.length,
+      itemBuilder: (context, index) {
+        final item = featureGridItem[index];
+
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: RoundedContainerDrawable(
+            onTap: () {
+              if (item.page.isNotEmpty) {
+                Navigator.pushNamed(context, item.page);
+              }
+            },
+            padding: 0.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Set the icon/logo of features from here
+                Icon(item.icon, size: 40.0),
+                const SizedBox(height: 14.0),
+                // Set the title of features from here
+                Text(
+                  item.title,
+                  style: const TextStyle(fontSize: 14.0),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHomeHeader() {
+    return const RoundedBlueDrawable();
+  }
+
+  Widget _buildStatisticData() {
+    return BlocBuilder<DashboardCubit, DashboardState>(
+      builder: (context, state) => RoundedContainerDrawable(
+        onTap: () {},
+        child: StatisticDataWidget(
+          tProduct: state.totalProdct,
+          tNewOrder: state.totalNewOrder,
+          tTransaction: state.totalTransaction,
+          tIncome: formatRupiah(state.netIncome),
         ),
       ),
     );

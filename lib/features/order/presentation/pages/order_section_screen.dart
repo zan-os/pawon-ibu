@@ -6,7 +6,7 @@ import 'package:pawon_ibu_app/features/order/presentation/cubit/order_cubit.dart
 import 'package:pawon_ibu_app/features/order/presentation/cubit/order_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../widgets/order_card_widget.dart';
+import '../../../../ui/widgets/order_card_widget.dart';
 
 class OrderSectionScreen extends StatelessWidget {
   const OrderSectionScreen({super.key});
@@ -28,7 +28,10 @@ class OrderSectionScreen extends StatelessWidget {
         builder: (context, state) {
           return Container(
             padding: const EdgeInsets.all(16),
-            child: ListView.builder(
+            child: ListView.separated(
+              separatorBuilder: (context, index) {
+                return const SizedBox(height: 8.0);
+              },
               itemCount: state.orderSection.length,
               itemBuilder: (context, index) {
                 final order = state.orderSection[index];
@@ -47,6 +50,8 @@ class OrderSectionScreen extends StatelessWidget {
                     ).then((value) => setInitFetch(args['status'], context));
                   },
                   child: OrderCard(
+                    bankImage: order.paymentType!.image!,
+                    bankName: order.paymentType!.name!,
                     status: order.transactionStatus ?? 1,
                     createdOrder: order.createdAt!,
                     firstName: order.user!.firstName!,

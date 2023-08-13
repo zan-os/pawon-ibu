@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,13 +29,12 @@ class OrderCubit extends Cubit<OrderState> {
   }
 
   void fetchNotConfirmedOrder() async {
-    log('ojan executed');
     emit(state.copyWith(status: CubitState.loading));
     try {
       final List response = await _supabase
           .from('transaction')
           .select(
-            '*, user:user_id( id, first_name, last_name, address, telepon, lat, long), transaction_detail:id(*)',
+            '*, user:user_id( id, first_name, last_name, address, telepon, lat, long), transaction_detail:id(*), payment_type:payment_id(*)',
           )
           .eq('transaction_status', 1);
 
@@ -48,19 +48,18 @@ class OrderCubit extends Cubit<OrderState> {
       ));
 
       emit(state.copyWith(status: CubitState.initial));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 
   void fetchInProgressOrder() async {
-    log('ojan executed');
     emit(state.copyWith(status: CubitState.loading));
     try {
       final List response = await _supabase
           .from('transaction')
           .select(
-            '*, user:user_id( id, first_name, last_name, address, telepon, lat, long), transaction_detail:id(*)',
+            '*, user:user_id( id, first_name, last_name, address, telepon, lat, long), transaction_detail:id(*), payment_type:payment_id(*)',
           )
           .eq('transaction_status', 2);
 
@@ -74,8 +73,8 @@ class OrderCubit extends Cubit<OrderState> {
       ));
 
       emit(state.copyWith(status: CubitState.initial));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 
@@ -86,7 +85,7 @@ class OrderCubit extends Cubit<OrderState> {
       final List response = await _supabase
           .from('transaction')
           .select(
-            '*, user:user_id( id, first_name, last_name, address, telepon, lat, long), transaction_detail:id(*)',
+            '*, user:user_id( id, first_name, last_name, address, telepon, lat, long), transaction_detail:id(*), payment_type:payment_id(*)',
           )
           .eq('transaction_status', 3);
 
@@ -100,8 +99,8 @@ class OrderCubit extends Cubit<OrderState> {
       ));
 
       emit(state.copyWith(status: CubitState.initial));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 
@@ -112,7 +111,7 @@ class OrderCubit extends Cubit<OrderState> {
       final List response = await _supabase
           .from('transaction')
           .select(
-            '*, user:user_id( id, first_name, last_name, address, telepon, lat, long), transaction_detail:id(*)',
+            '*, user:user_id( id, first_name, last_name, address, telepon, lat, long), transaction_detail:id(*), payment_type:payment_id(*)',
           )
           .eq('transaction_status', 4);
 
@@ -126,8 +125,8 @@ class OrderCubit extends Cubit<OrderState> {
       ));
 
       emit(state.copyWith(status: CubitState.initial));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 
@@ -137,7 +136,7 @@ class OrderCubit extends Cubit<OrderState> {
       final List response = await _supabase
           .from('transaction')
           .select(
-            '*, user:user_id( id, first_name, last_name, address, telepon, lat, long), transaction_detail:id(*)',
+            '*, user:user_id( id, first_name, last_name, address, telepon, lat, long), transaction_detail:id(*), payment_type:payment_id(*)',
           )
           .eq('transaction_status', 5);
 
@@ -150,19 +149,20 @@ class OrderCubit extends Cubit<OrderState> {
       ));
 
       emit(state.copyWith(status: CubitState.initial));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 
   void fetchOrderDetail() async {
     try {
-      final List response = await _supabase
-          .from('transaction_detail')
-          .select(
-            '*,transaction:transaction_id (*), product:product_id (name, image), user:user_id(id, first_name, last_name, address, telepon, lat, long)',
-          )
-          .eq('transaction_id', _transactionId);
+      final List response = await _supabase.from('transaction_detail').select(
+        '''*,
+            transaction:transaction_id(*, payment_type:payment_id(*)),
+            product:product_id (name, image),
+            user:user_id(id, first_name, last_name, address, telepon, lat, long)''',
+      ).eq('transaction_id', _transactionId);
+      log('ojan ${jsonEncode(response)}');
       final List<TransactionDetailModel> transaction =
           response.map((e) => TransactionDetailModel.fromJson(e)).toList();
 
@@ -174,31 +174,31 @@ class OrderCubit extends Cubit<OrderState> {
       ));
 
       emit(state.copyWith(status: CubitState.initial));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 
-  Future<void> confirmOrder() async {
+  Future<void> confirmOrder({required int expanses}) async {
     try {
       await _supabase.from('transaction').update({
         'transaction_status': 2,
         'received_payment_total': state.totalBill,
+        'expenses': expanses
       }).match({'id': _transactionId});
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 
-  Future<void> completeProcess({required int expanses}) async {
+  Future<void> completeProcess() async {
     try {
       await _supabase.from('transaction').update({
         'transaction_status': 3,
         'received_payment_total': state.totalBill,
-        'expanses': expanses
       }).match({'id': _transactionId});
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 
@@ -208,8 +208,8 @@ class OrderCubit extends Cubit<OrderState> {
         'transaction_status': 4,
         'received_payment_total': state.totalBill,
       }).match({'id': _transactionId});
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 
@@ -219,8 +219,8 @@ class OrderCubit extends Cubit<OrderState> {
         'transaction_status': 5,
         'received_payment_total': state.totalBill,
       }).match({'id': _transactionId});
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
     }
   }
 }

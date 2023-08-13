@@ -44,8 +44,8 @@ class ProductDetailCubit extends Cubit<ProductDetailState> {
       ));
 
       emit(state.copyWith(status: CubitState.initial));
-    } catch (e) {
-      errorLogger(e);
+    } catch (e, s) {
+      errorLogger(e, s);
       emit(state.copyWith(
         status: CubitState.error,
         message: 'Gagal menambahkan ke keranjang',

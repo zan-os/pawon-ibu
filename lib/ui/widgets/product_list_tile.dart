@@ -39,6 +39,8 @@ class ProductListTile extends StatelessWidget {
               children: [
                 CachedNetworkImage(
                   imageUrl: image ?? '',
+                  height: 80,
+                  width: 80,
                   errorWidget: (context, url, error) {
                     return const Icon(
                       Icons.broken_image_outlined,

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawon_ibu_app/common/data/model/product_model.dart';
@@ -147,8 +148,8 @@ class _ScaffoldBody extends StatelessWidget {
     return Container(
       color: greyColor,
       height: MediaQuery.of(context).size.height * 0.36,
-      child: const Center(
-        child: Text('Image here...'),
+      child: CachedNetworkImage(
+        imageUrl: product.image ?? '',
       ),
     );
   }
