@@ -1,0 +1,128 @@
+{
+    "status": "ok",
+    "message": "berhasil mendapatkan timeline anak",
+    "data": [
+        {
+            "id": 1,
+            "type": "Catatan",
+            "description": "Hari ini ada PR menulis huruf ABC, mohon agar mendampingi Aditya",
+            "created_at": "2023-09-22T02:44:07.000Z"
+        },
+        {
+            "id": 1,
+            "type": "Check-Out",
+            "time": "13:20",
+            "created_at": "2023-09-22T02:44:07.000Z"
+        },
+        {
+            "id": 1,
+            "type": "Obat/Vitamin",
+            "time": "13:20",
+            "name": "Resep dokter",
+            "description": "Minum obat dan sempet mual",
+            "files": [
+                {
+                    "id": 1,
+                    "activity_id": 1,
+                    "type": "image",
+                    "file_url": "https://aws...."
+                }
+            ],
+            "created_at": "2023-09-22T02:44:07.000Z"
+        },
+        {
+            "id": 1,
+            "type": "Mandi",
+            "time": "13:20",
+            "description": "Aditya sudah dimandikan",
+            "files": [
+                {
+                    "id": 1,
+                    "activity_id": 1,
+                    "type": "image",
+                    "file_url": "https://aws...."
+                }
+            ],
+            "created_at": "2023-09-22T02:44:07.000Z"
+        },
+        {
+            "id": 1,
+            "type": "Kegiatan",
+            "name": "Bermain bola, menyanyi dan melukis",
+            "description": "Aditya hari ini sangat aktif sekali",
+            "files": [
+                {
+                    "id": 1,
+                    "activity_id": 1,
+                    "type": "image",
+                    "file_url": "https://aws...."
+                }
+            ],
+            "created_at": "2023-09-22T02:44:07.000Z"
+        },
+        {
+            "id": 1,
+            "type": "Toilet",
+            "time": "13:20",
+            "name": "Buang Air Kecil",
+            "is_success_potty_training": true,
+            "description": "Buang air kecil setelah bangun tidur",
+            "files": [
+                {
+                    "id": 1,
+                    "activity_id": 1,
+                    "type": "image",
+                    "file_url": "https://aws...."
+                }
+            ],
+            "created_at": "2023-09-22T02:44:07.000Z"
+        },
+        {
+            "id": 1,
+            "type": "Tidur",
+            "bedtime": "13:20",
+            "wakeup": "14:20",
+            "duration": "1 jam 1 menit",
+            "created_at": "2023-09-22T02:44:07.000Z"
+        },
+        {
+            "id": 1,
+            "type": "Susu",
+            "time": "13:20",
+            "milk_size": 100,
+            "is_finished": true,
+            "created_at": "2023-09-22T02:44:07.000Z"
+        },
+        {
+            "id": 1,
+            "type": "Makan",
+            "time": "13:20",
+            "eating_time": "Snack Pagi",
+            "is_finished": true,
+            "name": "Sandwich Tuna",
+            "description": "Makannya sangat lahap",
+            "files": [
+                {
+                    "id": 1,
+                    "activity_id": 1,
+                    "type": "image",
+                    "file_url": "https://aws...."
+                }
+            ],
+            "created_at": "2023-09-22T02:44:07.000Z"
+        },
+        {
+            "id": 1,
+            "type": "Kesehatan",
+            "temperature": 37,
+            "weight": 15.5,
+            "created_at": "2023-09-22T02:44:07.000Z"
+        },
+        {
+            "id": 1,
+            "type": "Check-In",
+            "time": "13:20",
+            "created_at": "2023-09-22T02:44:07.000Z"
+        }
+    ]
+}
